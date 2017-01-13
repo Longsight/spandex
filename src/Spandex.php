@@ -9,6 +9,7 @@ class Spandex
 {
     const HASH_STRETCH = 14;
     public $debug = false;
+    public $config;
     private $doctrineConfig;
     private $connections = array();
     private $entityManagers = array();
@@ -147,7 +148,7 @@ class Spandex
     {
         $this->connections[$name] = $connection;
     }
-    
+
     /**
      * @return Cache The cache
      */
@@ -215,7 +216,7 @@ class Spandex
         $this->bootstrapDoctrine();
         $this->cache = new Cache($this->cacheType);
         $this->request = trim($_REQUEST['r'], " \t\n\r\0\x0B/");
-        
+
         /**
          * Initialise Twig
          *
