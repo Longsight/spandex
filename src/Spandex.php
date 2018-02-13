@@ -26,7 +26,6 @@ class Spandex
     private $sessionPrefix = 'session';
     private $sessionExpiry = 2592000;
     private $cache;
-    private $cacheType = 'xcache';
 
     /**
      * @param string $appRoot The application root
@@ -157,14 +156,6 @@ class Spandex
         return $this->cache;
     }
 
-    /**
-     * @param string $type The cache type
-     */
-    public function setCacheType($type)
-    {
-        $this->cacheType = $type;
-    }
-
     private function bootstrapDoctrine()
     {
         $this->doctrineConfig = Setup::createAnnotationMetadataConfiguration(array(
@@ -214,7 +205,7 @@ class Spandex
     {
         ini_set('session.use_cookies', '0');
         $this->bootstrapDoctrine();
-        $this->cache = new Cache($this->cacheType);
+        $this->cache = new Cache($this->config);
         $this->request = trim($_REQUEST['r'], " \t\n\r\0\x0B/");
 
         /**

@@ -18,11 +18,20 @@ class Cache
         return sprintf('%s-%s', $prefix, md5(serialize($object)));
     }
 
-    public function __construct($type)
+    public function __construct($config)
     {
+        $type = $config['CacheType'];
         switch ($type) {
             case 'xcache':
                 $this->backend = new XCacheBackend;
+                break;
+            case 'memcached':
+                $options = [
+                    'username' => $config['MemcachedUsername'],
+                    'password' => $config['MemcachedPassword'],
+                    'servers' => $config['MemcachedServers']
+                ];
+                $this->backend = new MemcachedBackend($options);
                 break;
             default:
                 throw new \DomainException('Unknown cache type: \'' . $type . '\'');
