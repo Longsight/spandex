@@ -4,6 +4,8 @@ namespace Spandex;
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use Predis;
 
 class Spandex
 {
@@ -26,6 +28,9 @@ class Spandex
     private $sessionPrefix = 'session';
     private $sessionExpiry = 2592000;
     private $cache;
+
+    private $queue = null;
+    private $redis = null;
 
     /**
      * @param string $appRoot The application root
@@ -154,6 +159,22 @@ class Spandex
     public function getCache()
     {
         return $this->cache;
+    }
+
+    /**
+     * @return Object The queue
+     */
+    public function getQueue()
+    {
+        return $this->queue;
+    }
+
+    /**
+     * @return Object The redis connection
+     */
+    public function getRedis()
+    {
+        return $this->redis;
     }
 
     private function bootstrapDoctrine()
@@ -353,6 +374,19 @@ class Spandex
             'jsPath' => $this->js,
             'user' => ($this->getSession()? $this->getSession()->getUser(): false)
         )));
+    }
+
+    public function bootstrapQueue()
+    {
+        $rabbitmq = parse_url($this->config['AMQP']);
+        $this->queue = new AMQPStreamConnection(
+            $rabbitmq['host'],
+            isset($rabbitmq['port'])? $rabbitmq['port']: 5672,
+            $rabbitmq['user'],
+            $rabbitmq['pass'],
+            substr($rabbitmq['path'], 1) ?: '/'
+        );
+        $this->redis = new Predis\Client($this->config['Redis']);
     }
 
     /**
