@@ -378,6 +378,12 @@ class Spandex
 
     public function bootstrapQueue()
     {
+        if (!$this->config['AMQP'] || !$this->config['Redis']) {
+            return;
+        }
+        if ($this->queue || $this->redis) {
+            return;
+        }
         $rabbitmq = parse_url($this->config['AMQP']);
         $this->queue = new AMQPStreamConnection(
             $rabbitmq['host'],
