@@ -4,6 +4,7 @@ namespace Spandex;
 
 use Spandex\Cache\Providers\FileCacheProvider;
 use Spandex\Cache\Backends\XCacheBackend;
+use Spandex\Cache\Backends\MemcachedBackend;
 use Spandex\Interfaces\ICacheProvider;
 
 class Cache
