@@ -5,7 +5,7 @@ namespace Spandex\Cache\Backends;
 use Spandex\Interfaces\ICacheBackend;
 use Spandex\Cache\Providers\FileCacheProvider;
 
-class XCacheBackend
+class XCacheBackend implements ICacheBackend
 {
     public function get($name)
     {

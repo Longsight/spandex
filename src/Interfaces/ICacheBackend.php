@@ -6,4 +6,5 @@ interface ICacheBackend
 {
     public function get($name);
     public function set($name, $cache, $ttl);
+    public function remove($name);
 }

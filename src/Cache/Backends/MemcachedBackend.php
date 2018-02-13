@@ -5,29 +5,29 @@ namespace Spandex\Cache\Backends;
 use Spandex\Interfaces\ICacheBackend;
 use Spandex\Cache\Providers\FileCacheProvider;
 
-class MemcachedBackend
+class MemcachedBackend implements ICacheBackend
 {
     private $instance;
 
     public function __construct($options) {
-        $m = new Memcached('memcached_pool');
-        $m->setOption(Memcached::OPT_BINARY_PROTOCOL, TRUE);
+        $m = new \Memcached('memcached_pool');
+        $m->setOption(\Memcached::OPT_BINARY_PROTOCOL, TRUE);
 
         // some nicer default options
         // - nicer TCP options
-        $m->setOption(Memcached::OPT_TCP_NODELAY, TRUE);
-        $m->setOption(Memcached::OPT_NO_BLOCK, FALSE);
+        $m->setOption(\Memcached::OPT_TCP_NODELAY, TRUE);
+        $m->setOption(\Memcached::OPT_NO_BLOCK, FALSE);
         // - timeouts
-        $m->setOption(Memcached::OPT_CONNECT_TIMEOUT, 2000);    // ms
-        $m->setOption(Memcached::OPT_POLL_TIMEOUT, 2000);       // ms
-        $m->setOption(Memcached::OPT_RECV_TIMEOUT, 750 * 1000); // us
-        $m->setOption(Memcached::OPT_SEND_TIMEOUT, 750 * 1000); // us
+        $m->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 2000);    // ms
+        $m->setOption(\Memcached::OPT_POLL_TIMEOUT, 2000);       // ms
+        $m->setOption(\Memcached::OPT_RECV_TIMEOUT, 750 * 1000); // us
+        $m->setOption(\Memcached::OPT_SEND_TIMEOUT, 750 * 1000); // us
         // - better failover
-        $m->setOption(Memcached::OPT_DISTRIBUTION, Memcached::DISTRIBUTION_CONSISTENT);
-        $m->setOption(Memcached::OPT_LIBKETAMA_COMPATIBLE, TRUE);
-        $m->setOption(Memcached::OPT_RETRY_TIMEOUT, 2);
-        $m->setOption(Memcached::OPT_SERVER_FAILURE_LIMIT, 1);
-        $m->setOption(Memcached::OPT_AUTO_EJECT_HOSTS, TRUE);
+        $m->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+        $m->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, TRUE);
+        $m->setOption(\Memcached::OPT_RETRY_TIMEOUT, 2);
+        $m->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 1);
+        $m->setOption(\Memcached::OPT_AUTO_EJECT_HOSTS, TRUE);
         
         // setup authentication
         $m->setSaslAuthData($options['username'], $options['password']);
