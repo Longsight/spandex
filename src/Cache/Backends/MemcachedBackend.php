@@ -64,8 +64,8 @@ class MemcachedBackend implements ICacheBackend
                     $object = $provider->refresh($object['encoding']);
                     $this->set($name, $object, 0);
                     foreach ($object['depends'] as $depend) {
-                        if (xcache_isset($depend)) {
-                            xcache_unset($depend);
+                        if ($this->instance->get($depend)) {
+                            $this->instance->delete($depend);
                         }
                     }
                     header('X-Spandex-Cache: AUTO-REFRESH', false);
