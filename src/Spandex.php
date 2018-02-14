@@ -226,7 +226,7 @@ class Spandex
     {
         ini_set('session.use_cookies', '0');
         $this->bootstrapDoctrine();
-        $this->cache = new Cache($this->config);
+        $this->bootstrapCache();
         $this->request = trim($_REQUEST['r'], " \t\n\r\0\x0B/");
 
         /**
@@ -389,6 +389,11 @@ class Spandex
             substr($rabbitmq['path'], 1) ?: '/'
         );
         $this->redis = new Predis\Client($this->config['Redis']);
+    }
+
+    public function bootstrapCache()
+    {
+        $this->cache = new Cache($this->config);
     }
 
     /**
