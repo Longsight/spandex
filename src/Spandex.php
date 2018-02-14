@@ -230,17 +230,6 @@ class Spandex
         $this->request = trim($_REQUEST['r'], " \t\n\r\0\x0B/");
 
         /**
-         * Initialise Twig
-         *
-         * At this point, initialise the filesystem loader with the app root; we add other folders depending on
-         * the determined hook, and only initialise the Twig environment when it's needed
-         */
-        \Twig_Autoloader::register();
-        $twigLoader = new \Twig_Loader_Filesystem();
-        $twigLoader->addPath($this->appRoot . '/Templates', 'App');
-        $twigLoader->addPath(__DIR__ . '/Templates', 'Spandex');
-
-        /**
          * JS compilation
          */
         if ($this->js !== '' && $this->request === $this->js) {
@@ -250,11 +239,7 @@ class Spandex
                     $scripts[] = file_get_contents($filename);
                 }
             }
-            $this->twig = new \Twig_Environment($twigLoader, array(
-               'cache' => $this->twigCache,
-               'debug' => $this->debug,
-               'autoescape' => false
-            ));
+            $this->bootstrapTwig(false);
             header('Cache-Control: public, max-age=300');
             header('Content-Type: text/javascript; charset=utf-8');
             print($this->twig->render('@Spandex/hooks.js', array(
@@ -333,11 +318,9 @@ class Spandex
                     $hook = 'Error';
                     $action = 'getAction';
                 }
-                $twigLoader->addPath($hookPath, $hook);
-                $this->twig = new \Twig_Environment($twigLoader, array(
-                    'cache' => $this->twigCache,
-                    'debug' => $this->debug
-                ));
+                $this->bootstrapTwig(true, [
+                    $hookPath => $hook
+                ]);
                 $response = $hookClass->$action($params, $this);
                 header('Cache-Control: private, max-age=0, no-cache');
                 setcookie('csrf-protect', bin2hex(openssl_random_pseudo_bytes(32)), 0, '/');
@@ -364,16 +347,29 @@ class Spandex
         /**
          * Base template
          */
-        $this->twig = new \Twig_Environment($twigLoader, array(
-           'cache' => $this->twigCache,
-           'debug' => $this->debug
-        ));
+        $this->bootstrapTwig(true);
         header('Cache-Control: private, max-age=0, no-cache');
         header('Content-Type: text/html; charset=utf-8');
         print($this->twig->render('@App/base.html', array(
             'jsPath' => $this->js,
             'user' => ($this->getSession()? $this->getSession()->getUser(): false)
         )));
+    }
+
+    public function bootstrapTwig($autoescape, $paths = [])
+    {
+        \Twig_Autoloader::register();
+        $twigLoader = new \Twig_Loader_Filesystem();
+        $twigLoader->addPath($this->appRoot . '/Templates', 'App');
+        $twigLoader->addPath(__DIR__ . '/Templates', 'Spandex');
+        foreach ($paths as $path => $mapping) {
+            $twigLoader->addPath($path, $mapping);
+        }
+        $this->twig = new \Twig_Environment($twigLoader, array(
+            'cache' => $this->twigCache,
+            'debug' => $this->debug,
+            'autoescape' => $autoescape
+         ));
     }
 
     public function bootstrapQueue()
